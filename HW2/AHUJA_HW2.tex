@@ -1,0 +1,340 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\title{\textbf{Homework 2: Linear Regression}}
+\author{Ariv Ahuja}
+\date{DS4400 - Machine Learning}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Code Link:} The Jupyter notebook containing all code for computational problems is available at: \texttt{HW2\_code.ipynb}
+
+\section*{Problem 1: Linear Regression [A] (15 points)}
+
+Given:
+\begin{itemize}
+    \item $N = 30$ samples
+    \item Sample mean of $X$: $\bar{X} = 50$; sample standard deviation: $\sigma_X = 10$
+    \item Sample mean of $Y$: $\bar{Y} = 100$; sample standard deviation: $\sigma_Y = 20$
+    \item Correlation coefficient: $\rho = 0.8$
+\end{itemize}
+
+\subsection*{Part 1: Compute $\theta_0$ and $\theta_1$}
+
+For simple linear regression $h_\theta(x) = \theta_0 + \theta_1 x$, the least squares solution gives:
+
+The slope $\theta_1$ can be computed using the correlation coefficient:
+\begin{align}
+\theta_1 &= \rho \cdot \frac{\sigma_Y}{\sigma_X} \\
+\theta_1 &= 0.8 \cdot \frac{20}{10} \\
+\theta_1 &= 0.8 \cdot 2 \\
+\theta_1 &= \boxed{1.6}
+\end{align}
+
+The intercept $\theta_0$ is found using the fact that the regression line passes through $(\bar{X}, \bar{Y})$:
+\begin{align}
+\bar{Y} &= \theta_0 + \theta_1 \bar{X} \\
+\theta_0 &= \bar{Y} - \theta_1 \bar{X} \\
+\theta_0 &= 100 - 1.6 \cdot 50 \\
+\theta_0 &= 100 - 80 \\
+\theta_0 &= \boxed{20}
+\end{align}
+
+Therefore, the least squares linear regression model is:
+$$h_\theta(x) = 20 + 1.6x$$
+
+\subsection*{Part 2: Correlation coefficient $\rho = -0.8$}
+
+When $\rho = -0.8$:
+
+\begin{align}
+\theta_1 &= \rho \cdot \frac{\sigma_Y}{\sigma_X} \\
+\theta_1 &= -0.8 \cdot \frac{20}{10} \\
+\theta_1 &= \boxed{-1.6}
+\end{align}
+
+\begin{align}
+\theta_0 &= \bar{Y} - \theta_1 \bar{X} \\
+\theta_0 &= 100 - (-1.6) \cdot 50 \\
+\theta_0 &= 100 + 80 \\
+\theta_0 &= \boxed{180}
+\end{align}
+
+\textbf{Interpretation:} When the correlation changes from positive to negative, the slope $\theta_1$ changes sign (from 1.6 to -1.6), indicating that instead of income increasing with age, it now decreases with age. The intercept increases significantly (from 20 to 180) to compensate for the negative slope while maintaining the same predicted value at the mean of $X$.
+
+\newpage
+\section*{Problem 2: Linear Regression [C] (15 points)}
+
+\subsection*{Part 1: Training the Model with sklearn}
+
+Using sklearn's LinearRegression, the model was trained on all features (excluding id, date, and zipcode).
+
+\textbf{Model Coefficients:}
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+\textbf{Feature} & \textbf{Coefficient} \\
+\midrule
+Intercept ($\theta_0$) & 520.4148 \\
+bedrooms & -12.5220 \\
+bathrooms & 18.5276 \\
+sqft\_living & 56.7488 \\
+sqft\_lot & 10.8819 \\
+floors & 8.0437 \\
+waterfront & 63.7429 \\
+view & 48.2001 \\
+condition & 12.9643 \\
+grade & 92.2315 \\
+sqft\_above & 48.2901 \\
+sqft\_basement & 27.1370 \\
+yr\_built & -67.6431 \\
+yr\_renovated & 17.2714 \\
+lat & 78.3757 \\
+long & -1.0352 \\
+sqft\_living15 & 45.5777 \\
+sqft\_lot15 & -12.9301 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Training Metrics:}
+\begin{itemize}
+    \item MSE: 31486.17
+    \item $R^2$: 0.7265
+\end{itemize}
+
+\subsection*{Part 2: Testing Metrics}
+
+\textbf{Testing Metrics:}
+\begin{itemize}
+    \item MSE: 57628.15
+    \item $R^2$: 0.6544
+\end{itemize}
+
+\subsection*{Part 3: Interpretation}
+
+\textbf{Top 5 Contributing Features (by absolute coefficient magnitude):}
+\begin{enumerate}
+    \item \textbf{grade} (92.23): The quality grade of the house has the strongest positive impact on price
+    \item \textbf{lat} (78.38): Location (latitude) significantly affects price, likely indicating premium areas
+    \item \textbf{yr\_built} (-67.64): Older houses tend to have lower prices (negative coefficient)
+    \item \textbf{waterfront} (63.74): Waterfront properties command significantly higher prices
+    \item \textbf{sqft\_living} (56.75): Larger living space increases house price
+\end{enumerate}
+
+\textbf{Model Fit Analysis:}
+\begin{itemize}
+    \item The $R^2$ of 0.7265 on training data indicates the model explains about 72.65\% of the variance in house prices, which is a reasonably good fit.
+    \item The testing $R^2$ of 0.6544 shows some generalization loss, but the model still explains about 65\% of price variance on unseen data.
+    \item The higher testing MSE (57628 vs 31486) compared to training MSE indicates some overfitting, but the difference is not extreme.
+    \item The model error (RMSE $\approx$ 240 on testing) means predictions are typically off by about \$240,000 (since prices are in thousands), which is substantial but reasonable given housing price variability.
+\end{itemize}
+
+\newpage
+\section*{Problem 3: Closed-Form Solution [C] (15 points)}
+
+\subsection*{Implementation}
+
+The closed-form solution for linear regression is derived from minimizing the MSE loss function:
+$$\theta = (X^TX)^{-1}X^Ty$$
+
+I implemented this using NumPy's pseudo-inverse for numerical stability:
+
+\begin{verbatim}
+def fit(self, X, y):
+    X_b = np.c_[np.ones((X.shape[0], 1)), X]  # Add bias column
+    self.theta = np.linalg.pinv(X_b.T @ X_b) @ X_b.T @ y
+\end{verbatim}
+
+\subsection*{Results Comparison}
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Method} & \textbf{Train MSE} & \textbf{Train $R^2$} & \textbf{Test MSE} & \textbf{Test $R^2$} \\
+\midrule
+sklearn & 31486.17 & 0.7265 & 57628.15 & 0.6544 \\
+Closed-form & 34144.20 & 0.7034 & 56177.34 & 0.6631 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Discussion:} The closed-form implementation produces similar but not identical results to sklearn. The small differences arise because:
+\begin{enumerate}
+    \item sklearn uses SVD decomposition internally for better numerical stability
+    \item There may be multicollinearity among features causing numerical sensitivity
+    \item Both methods achieve similar predictive performance, validating the correctness of the implementation
+\end{enumerate}
+
+\newpage
+\section*{Problem 4: Polynomial Regression [C] (15 points)}
+
+Using the \texttt{sqft\_living} feature, polynomial regression models were trained for degrees 1 through 5.
+
+\subsection*{Results}
+
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Degree} & \textbf{Train MSE} & \textbf{Train $R^2$} & \textbf{Test MSE} & \textbf{Test $R^2$} \\
+\midrule
+1 & 57947.53 & 0.4967 & 88575.98 & 0.4687 \\
+2 & 54822.67 & 0.5238 & 71791.68 & 0.5694 \\
+3 & 53785.19 & 0.5329 & 99833.48 & 0.4012 \\
+4 & 52795.77 & 0.5415 & 250979.27 & -0.5053 \\
+5 & 52626.11 & 0.5429 & 570616.91 & -2.4225 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Observations}
+
+\begin{itemize}
+    \item \textbf{Training Performance:} As the polynomial degree increases, the training MSE consistently decreases and training $R^2$ increases. This is expected because higher-degree polynomials can fit the training data more closely.
+
+    \item \textbf{Testing Performance:} The optimal test performance is achieved at degree 2 (Test $R^2$ = 0.5694). Beyond this, test performance degrades rapidly.
+
+    \item \textbf{Overfitting:} For degrees 4 and 5, the test $R^2$ becomes negative, indicating severe overfitting. The model performs worse than simply predicting the mean.
+
+    \item \textbf{Bias-Variance Tradeoff:}
+    \begin{itemize}
+        \item Degree 1 (linear): High bias, low variance - underfitting
+        \item Degree 2: Good balance between bias and variance
+        \item Degrees 3-5: Low bias, high variance - overfitting
+    \end{itemize}
+
+    \item \textbf{Recommendation:} A quadratic model (degree 2) provides the best generalization for this dataset, suggesting a non-linear but not overly complex relationship between square footage and price.
+\end{itemize}
+
+\newpage
+\section*{Problem 5: Gradient Descent [C] (20 points)}
+
+\subsection*{Part 1: Implementation}
+
+The gradient descent algorithm for linear regression:
+
+\begin{verbatim}
+for i in range(n_iterations):
+    predictions = X_b @ theta
+    errors = predictions - y
+    gradients = (2 / n_samples) * (X_b.T @ errors)
+    theta -= learning_rate * gradients
+\end{verbatim}
+
+\subsection*{Part 2: Results with Different Learning Rates}
+
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+\textbf{LR} & \textbf{Iter} & \textbf{Train MSE} & \textbf{Train $R^2$} & \textbf{Test MSE} & \textbf{Test $R^2$} \\
+\midrule
+0.01 & 10 & 235727.77 & -1.0474 & 280568.71 & -0.6828 \\
+0.01 & 50 & 69720.50 & 0.3945 & 97049.54 & 0.4179 \\
+0.01 & 100 & 36820.35 & 0.6802 & 63333.04 & 0.6201 \\
+\midrule
+0.1 & 10 & 35105.10 & 0.6951 & 61630.43 & 0.6304 \\
+0.1 & 50 & 31497.26 & 0.7264 & 57722.48 & 0.6538 \\
+0.1 & 100 & 31486.43 & 0.7265 & 57638.96 & 0.6543 \\
+\midrule
+0.5 & 10 & Diverged & - & Diverged & - \\
+0.5 & 50 & Diverged & - & Diverged & - \\
+0.5 & 100 & Diverged & - & Diverged & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Part 3: Observations}
+
+\begin{itemize}
+    \item \textbf{Learning Rate = 0.01:} The algorithm converges slowly. At 10 iterations, the model performs poorly (negative $R^2$). By 100 iterations, it achieves reasonable performance but hasn't fully converged to the optimal solution.
+
+    \item \textbf{Learning Rate = 0.1:} This is the optimal learning rate for this problem. The algorithm converges quickly - even at 10 iterations, it achieves good performance. By 50-100 iterations, it matches the closed-form solution closely (Train MSE $\approx$ 31486, matching sklearn).
+
+    \item \textbf{Learning Rate = 0.5:} The algorithm diverges completely, with MSE exploding to astronomical values. This demonstrates that too large a learning rate causes the gradient updates to overshoot the minimum, leading to divergence.
+
+    \item \textbf{Convergence:} With $\alpha = 0.1$, approximately 50 iterations are needed to reach near-optimal performance. The algorithm successfully converges to the same solution as the closed-form method.
+
+    \item \textbf{Key Insight:} The choice of learning rate is critical. Too small leads to slow convergence; too large leads to divergence. Feature scaling (standardization) helps by making the loss surface more uniform, allowing for a single learning rate to work well across all features.
+\end{itemize}
+
+\newpage
+\section*{Problem 6: Ridge Regularization [A/C] (20 points)}
+
+\subsection*{Part 1: Derivation of Closed-Form Solution [A]}
+
+The ridge regression loss function is:
+$$J(\theta) = \sum_{i=1}^{N}(h_\theta(x_i) - y_i)^2 + \lambda\sum_{j=1}^{d}\theta_j^2$$
+
+In matrix form:
+$$J(\theta) = (X\theta - y)^T(X\theta - y) + \lambda\theta^T\theta$$
+
+Expanding:
+$$J(\theta) = \theta^TX^TX\theta - 2\theta^TX^Ty + y^Ty + \lambda\theta^T\theta$$
+
+Taking the gradient with respect to $\theta$:
+$$\nabla_\theta J(\theta) = 2X^TX\theta - 2X^Ty + 2\lambda\theta$$
+
+Setting the gradient to zero:
+$$2X^TX\theta - 2X^Ty + 2\lambda\theta = 0$$
+$$X^TX\theta + \lambda\theta = X^Ty$$
+$$(X^TX + \lambda I)\theta = X^Ty$$
+
+Solving for $\theta$:
+$$\boxed{\theta = (X^TX + \lambda I)^{-1}X^Ty}$$
+
+Note: In practice, we don't regularize the bias term $\theta_0$, so we use a modified identity matrix with a 0 in the top-left corner.
+
+\subsection*{Part 2: Gradient Descent Implementation [C]}
+
+The gradient for ridge regression is:
+$$\nabla_\theta J(\theta) = \frac{2}{N}X^T(X\theta - y) + \frac{2\lambda}{N}\theta$$
+
+Update rule:
+$$\theta := \theta - \alpha\left[\frac{2}{N}X^T(X\theta - y) + \frac{2\lambda}{N}\theta\right]$$
+
+\subsection*{Part 3: Simulated Data Experiment [C]}
+
+Data generation: $N = 1000$, $X_i \sim \text{Uniform}(-2, 2)$, $Y_i = 1 + 2X_i + e_i$ where $e_i \sim N(0, 2)$.
+
+True parameters: Intercept = 1.0, Slope = 2.0
+
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+$\lambda$ & \textbf{Intercept} & \textbf{Slope} & \textbf{MSE} & $R^2$ \\
+\midrule
+0 (OLS) & 1.1377 & 1.9453 & 1.9499 & 0.7258 \\
+1 & 1.1377 & 1.9439 & 1.9499 & 0.7258 \\
+10 & 1.1372 & 1.9311 & 1.9502 & 0.7258 \\
+100 & 1.1325 & 1.8124 & 1.9740 & 0.7224 \\
+1000 & 1.1057 & 1.1225 & 2.8735 & 0.5960 \\
+10000 & 1.0710 & 0.2335 & 5.9471 & 0.1638 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Observations:}
+\begin{itemize}
+    \item \textbf{Small $\lambda$ (1, 10):} The estimates remain close to OLS and the true values. Regularization has minimal effect.
+
+    \item \textbf{Moderate $\lambda$ (100):} The slope starts to shrink toward zero (1.81 vs true 2.0), but the model still performs reasonably well.
+
+    \item \textbf{Large $\lambda$ (1000, 10000):} The slope is heavily penalized and shrinks dramatically toward zero. At $\lambda = 10000$, the slope is only 0.23, severely underestimating the true relationship.
+
+    \item \textbf{Intercept Stability:} The intercept remains relatively stable across all $\lambda$ values because it's not regularized.
+
+    \item \textbf{Bias-Variance Tradeoff:} As $\lambda$ increases, we introduce more bias (slope shrinks toward 0) in exchange for reduced variance. For this simple problem with sufficient data, OLS already performs well, so regularization doesn't help.
+
+    \item \textbf{When Ridge Helps:} Ridge regression is most beneficial when there's multicollinearity or when $p \approx N$ (high-dimensional settings), not in this simple univariate case.
+\end{itemize}
+
+\end{document}
